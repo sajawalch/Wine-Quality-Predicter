@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wine Quality Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Work+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+  <main class="layout">
+
+    <aside class="summary">
+      <h1>Wine quality predictor</h1>
+      <p class="lead">Enter the lab measurements for a red wine to estimate its quality score on a scale from 3 to 8.</p>
+
+      {% if error %}
+        <div class="error" role="alert">{{ error }}</div>
+      {% endif %}
+
+      {% if prediction is not none %}
+        {% set r = rounded if rounded is defined else (prediction|round|int) %}
+        {% set pos = [[0, (r - 3) * 20]|max, 100]|min %}
+        <section class="result" aria-live="polite">
+          <p class="score">{{ r }}</p>
+          <p class="score-note">out of 8 &middot; model output {{ prediction }}</p>
+          <div class="scale" aria-hidden="true">
+            <span class="marker" style="left: {{ pos }}%"></span>
+          </div>
+          <div class="scale-labels" aria-hidden="true">
+            <span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+          </div>
+        </section>
+      {% else %}
+        <p class="empty">Fill in all 11 fields and select <strong>Predict quality</strong> to see the score here.</p>
+      {% endif %}
+    </aside>
+
+    <form class="form" action="{{ url_for('predict') }}" method="POST">
+
+      <fieldset>
+        <legend>Acidity</legend>
+        <label>Fixed acidity
+          <input type="number" step="any" min="0" name="fixed_acidity" placeholder="7.4" required value="{{ request.form.get('fixed_acidity', '') }}">
+        </label>
+        <label>Volatile acidity
+          <input type="number" step="any" min="0" name="volatile_acidity" placeholder="0.70" required value="{{ request.form.get('volatile_acidity', '') }}">
+        </label>
+        <label>Citric acid
+          <input type="number" step="any" min="0" name="citric_acid" placeholder="0.00" required value="{{ request.form.get('citric_acid', '') }}">
+        </label>
+        <label>pH
+          <input type="number" step="any" min="0" name="pH" placeholder="3.51" required value="{{ request.form.get('pH', '') }}">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Body</legend>
+        <label>Residual sugar
+          <input type="number" step="any" min="0" name="residual_sugar" placeholder="1.9" required value="{{ request.form.get('residual_sugar', '') }}">
+        </label>
+        <label>Density
+          <input type="number" step="any" min="0" name="density" placeholder="0.9978" required value="{{ request.form.get('density', '') }}">
+        </label>
+        <label>Alcohol (%)
+          <input type="number" step="any" min="0" name="alcohol" placeholder="9.4" required value="{{ request.form.get('alcohol', '') }}">
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Preservatives and salts</legend>
+        <label>Chlorides
+          <input type="number" step="any" min="0" name="chlorides" placeholder="0.076" required value="{{ request.form.get('chlorides', '') }}">
+        </label>
+        <label>Sulphates
+          <input type="number" step="any" min="0" name="sulphates" placeholder="0.56" required value="{{ request.form.get('sulphates', '') }}">
+        </label>
+        <label>Free sulfur dioxide
+          <input type="number" step="any" min="0" name="free_sulfur_dioxide" placeholder="11" required value="{{ request.form.get('free_sulfur_dioxide', '') }}">
+        </label>
+        <label>Total sulfur dioxide
+          <input type="number" step="any" min="0" name="total_sulfur_dioxide" placeholder="34" required value="{{ request.form.get('total_sulfur_dioxide', '') }}">
+        </label>
+      </fieldset>
+
+      <button type="submit">Predict quality</button>
+    </form>
+
+  </main>
+</body>
+</html>
