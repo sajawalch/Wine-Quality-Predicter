@@ -1,6 +1,6 @@
-streamlit
+Flask
+gunicorn
 pandas
 scikit-learn
 joblib
 numpy
-gunicorn
